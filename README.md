@@ -6,7 +6,7 @@ You provide a stack of research papers, and we return a shiny new scientific pap
 
 "But, wait," you might ask, "how does that work?" 🤔
 
-Well, it all starts with baby steps. We're taking the time to master abstract extraction for now, gradually squeezing meaningful juice out of the paper overflow. The goal? To deliver a summary that's so good, it's like you've read the whole thing.📖
+Well, it all starts with baby steps. Currently, our focus is to master extracting essential information from research papers, such as abstracts, author names, paper names, places of publishing, and years of issue. Once the papers are divided into manageable chunks, we delve deeper into each one, analyzing its relevance to your unique research goals. While we don't provide a single summarizing document, our goal is to equip you with a set of comprehensive insights about your paper stack. That way, you'll have all the relevant information at your fingertips, making it feel like you've read every single paper. 📖
 
 ## How It Works 🛠
 
