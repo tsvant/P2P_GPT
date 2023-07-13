@@ -1,75 +1,56 @@
 import os
 import openai
 from openai import ChatCompletion
+from config import API_KEY
+from data_processing import split_text, process_file, find_abstract, compile_abstracts
+from goal_alignment import create_goal_alignment_analysis, create_step_by_step_chunk_analysis
 
-openai.api_key = '<Insert OpenAI Key Here>'
+openai.api_key = API_KEY
 
-def split_text(text, length):
-    """Split the text into chunks of the given length."""
-    return [text[i:i+length] for i in range(0, len(text), length)]
+def get_user_goal(output_folder):
+    """Prompt the user to enter the goal of their research paper and save it in a text file."""
+    user_input_folder = os.path.join(os.path.dirname(output_folder), 'User input')
 
-def process_file(filename):
-    """Process a single file."""
-    # Create base sub-folder identical to the .txt file name
-    base_subfolder = os.path.splitext(filename)[0]
-    os.makedirs(base_subfolder, exist_ok=True)
+    os.makedirs(user_input_folder, exist_ok=True)
 
-    # Create subfolders for chunks and abstracts
-    chunks_folder = f'{base_subfolder}/chunks'
-    abstracts_folder = f'{base_subfolder}/abstract_search'
-    os.makedirs(chunks_folder, exist_ok=True)
-    os.makedirs(abstracts_folder, exist_ok=True)
+    user_goal = input("Please enter the goal of your research paper: ")
 
-    with open(filename, 'r', encoding="utf-8") as file:
-        content = file.read()
+    goal_filename = os.path.join(user_input_folder, "user_goal.txt")
+    with open(goal_filename, 'w', encoding="utf-8") as file:
+        file.write(user_goal)
 
-    chunks = split_text(content, 3000)
+    return goal_filename
 
-    for i, chunk in enumerate(chunks, start=1):
-        chunk_filename = f'{chunks_folder}/chunk_{i}.txt'
-        # Save chunk to a separate file
-        with open(chunk_filename, "w", encoding="utf-8") as file:
-            file.write(chunk)
-
-        # Generate abstract and save it into a separate file in the abstract_search folder
-        abstract = find_abstract(chunk)
-        abstract_filename = f'{abstracts_folder}/chunk_{i}_abstract.txt'
-        with open(abstract_filename, "w", encoding="utf-8") as file:
-            file.write(abstract)
-
-    compile_abstracts(base_subfolder, abstracts_folder)
-
-def find_abstract(text):
-    """Use GPT-3 to identify the abstract of the text."""
-    response = ChatCompletion.create(
-        model="gpt-3.5-turbo-0301",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant. Your task is to identify if the given text contains an abstract of a scientific paper. Do not infer or guess. You should only identify text that is explicitly labeled as an abstract. If you find such abstract, respond with 'Here's an abstract: *paste the actual content of the abstract here*'. If there isn't, respond only with 'Empty.'"},
-            {"role": "user", "content": f"{text}"},
-        ],
-        temperature=0.1,  # Lower the temperature to make output more deterministic
-    )
-
-    return response['choices'][0]['message']['content'].strip()
-
-def compile_abstracts(base_subfolder, abstracts_folder):
-    """Compile all abstracts into a single file."""
-    combined_abstracts = []
-    for filename in sorted(os.listdir(abstracts_folder)):
-        chunk_number = filename.split('_')[1]  # Extract chunk number from filename
-        with open(f'{abstracts_folder}/{filename}', 'r', encoding="utf-8") as file:
-            abstract = file.read()
-        combined_abstracts.append(f"Chunk {chunk_number}:\n{abstract}")
-    full_abstract_text = "\n\n".join(combined_abstracts)
-    with open(f'{base_subfolder}/full_abstract.txt', 'w', encoding="utf-8") as file:
-        file.write(full_abstract_text)
 
 print("Starting data processing...")
-folder = '<Insert Folder Directory Here>'
+input_folder = 'Upload here'
+output_folder = os.path.join(os.getcwd(), 'P2P Output')
+os.makedirs(output_folder, exist_ok=True)
+os.makedirs(input_folder, exist_ok=True)
 
-# Loop over all text files in the primary folder
-for filename in os.listdir(folder):
-    if filename.endswith('.txt'):
-        process_file(f'{folder}/{filename}')
+parent_directory = os.path.dirname(output_folder)
+user_input_folder = os.path.join(parent_directory, 'User input')
+os.makedirs(user_input_folder, exist_ok=True)
+
+user_goal_filename = get_user_goal(output_folder)  # Collect user goal
+
+# Loop over all text files in the input folder
+input_files = [filename for filename in os.listdir(input_folder) if filename.endswith('.txt')]
+total_files = len(input_files)
+print(f"Total files for processing: {total_files}\n")
+
+for file_index, filename in enumerate(input_files, start=1):
+    print(f"Processing file {file_index}/{total_files}: {filename}")
+
+    process_file(os.path.join(input_folder, filename), output_folder)
+
+    # Get the subdirectory name for the current file being processed
+    subdirectory = os.path.splitext(filename)[0]
+
+    # Create goal alignment analysis and step by step chunk analysis for the subdirectory
+    create_goal_alignment_analysis(output_folder, user_goal_filename)
+    create_step_by_step_chunk_analysis(output_folder, user_goal_filename, subdirectory)
+
+    print(f"Completed processing file {file_index}/{total_files}: {filename}\n")
 
 print("Data processing complete.")
