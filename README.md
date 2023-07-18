@@ -6,26 +6,33 @@ You provide a stack of research papers, and we return a shiny new scientific pap
 
 "But, wait," you might ask, "how does that work?" 🤔
 
-Well, it all starts with baby steps. Currently, our focus is to master extracting essential information from research papers, such as abstracts, author names, paper names, places of publishing, and years of issue. Once the papers are divided into manageable chunks, we delve deeper into each one, analyzing its relevance to your unique research goals. While we don't provide a single summarizing document, our goal is to equip you with a set of comprehensive insights about your paper stack. That way, you'll have all the relevant information at your fingertips, making it feel like you've read every single paper. 📖
+Well, let's walk through the updated process:
 
-## How It Works 🛠
+### How It Works 🛠
 
-At the heart of our system, we're leveraging OpenAI's GPT-3 model—a powerful language-predicting powerhouse. GPT-3 is excellent at understanding context, making it just the right tool for this job. 💪
+At the heart of our system is OpenAI's GPT-3 model, which is a powerful language model capable of understanding context. Here's the step-by-step breakdown of how P2P_GPT works:
 
-Here's the step-by-step breakdown:
+1. **File Processing**: P2P_GPT reads the full text of the research papers you provide and breaks them down into manageable chunks of text. Each chunk is saved into a separate file in a dedicated subfolder, named after the original paper. 📑
 
-1. **File Processing**: The system reads the full text of the research papers you provide and breaks each one down into manageable chunks of text. Each chunk is saved into a separate file in a dedicated subfolder, which is named after the original paper. 📑
+2. **Abstract and Metadata Extraction**: P2P_GPT uses GPT-3 to process each chunk and extract essential information such as abstracts, author names, paper names, places of publishing, and years of issue. This information is crucial for understanding the context of the content and is saved into separate files for easy reference. 🧐
 
-2. **Abstract and Metadata Extraction**: We then use GPT-3 to process each chunk. It's tasked with identifying any abstracts, author names, paper name, place of publishing, and year of issue in the text. This data is essential to understanding the context of the content and is saved into separate files for easy reference. 🧐
+3. **Goal Alignment Analysis**: With the abstract and other critical information in hand, P2P_GPT performs a "Goal alignment analysis." This involves comparing the content of the papers with your stated research goals to see how well they align. The results of this analysis are stored in a file for each paper. 🎯
 
-3. **Goal Alignment Analysis**: With the abstract and other critical information in hand, the system performs a "Goal alignment analysis". This involves comparing the content of the papers with your stated research goals to see how well they align. The results of this analysis are stored in a file for each paper. 🎯
+4. **Step-by-Step Chunk Analysis**: In addition to the overall goal alignment analysis, P2P_GPT performs a detailed "Step by step chunk analysis" for each paper. This involves analyzing each chunk of text individually to see how well it aligns with your research goals. The results of this analysis are also stored in separate files for each chunk. 🕵️‍♂️
 
-4. **Step-by-Step Chunk Analysis**: In addition to the overall goal alignment analysis, the system also performs a detailed "Step by step chunk analysis" for each paper. This involves analyzing each chunk of text individually to see how well it aligns with your research goals. The results of this analysis are stored in separate files for each chunk. 🕵️‍♂️
+5. **Generate Research Findings**: P2P_GPT generates a file for each paper containing key research findings based on the alignment analysis and your research goals. These findings help summarize the most relevant information from the papers. 💡
 
-In the end, you're left with a comprehensive set of data that summarizes the key content of your papers and provides insights into how well they align with your research goals. This valuable information can guide your further research and writing process. 🏆📝
+6. **Generate Final Research Findings**: Finally, P2P_GPT combines the research findings from all papers and generates a finalized research findings document. This document incorporates the key findings from each paper and provides a comprehensive summary based on your research goals. It ensures clarity, reproducibility, statistical significance, interpretation, discussion, transparency, and ethical considerations. 📝
 
-## Coming Next 🚀
+In the end, P2P_GPT provides you with a valuable set of data that summarizes the key content of your papers, analyzes their alignment with your research goals, and generates comprehensive research findings. This information can guide your further research and writing process, saving you time and effort. 🏆🔬
 
-This is only the beginning of a beautiful journey. We're already dreaming up the next steps, such as full-text article summarization, complex argument identification, cross-paper idea reconciliation (the real sci-fi stuff) and a lot more. 🌌
+### What's Next 🚀
+
+This is only the beginning of a beautiful journey. We are continuously improving P2P_GPT and exploring new possibilities. Here are some of the features we are considering for the future:
+
+- Full-text article summarization
+- Complex argument identification
+- Cross-paper idea reconciliation (the real sci-fi stuff)
+- And much more to enhance your research experience! 🌌
 
 Happy researching! 🎉🎉
