@@ -6,6 +6,10 @@ from data_processing import split_text, process_file, find_abstract, compile_abs
 from goal_alignment import create_step_by_step_chunk_analysis
 from generate_findings import generate_research_findings
 from generate_final_findings import generate_final_findings
+from generate_objectives import generate_research_objectives
+from generate_table_of_contents import generate_table_of_contents
+from generate_literature_review import generate_literature_review
+
 import time
 import openai.error
 
@@ -77,10 +81,11 @@ def main():
             subdirectory = os.path.splitext(filename)[0]
             create_step_by_step_chunk_analysis(output_folder, user_goal_filename, subdirectory)
 
-            generate_research_findings(output_folder, subdirectory)  # Move this line inside try block
+            generate_research_findings(output_folder, subdirectory)
+            generate_research_objectives(output_folder)
+            generate_literature_review(output_folder, filename)  # Pass 'filename' as a parameter
 
-            save_checkpoint(output_folder,
-                            file_index)  # Save checkpoint after successful completion of generate_research_findings
+            save_checkpoint(output_folder, file_index)
 
         except openai.error.ServiceUnavailableError:
             print("Service Unavailable Error. Retrying after 30 seconds...")
@@ -95,6 +100,13 @@ def main():
 
     # Generate final research findings
     generate_final_findings(output_folder)
+
+    # Generate research objectives
+    generate_research_objectives(output_folder)
+
+    generate_table_of_contents(output_folder)
+
+    generate_literature_review(output_folder)
 
     print("Data processing complete.")
 
