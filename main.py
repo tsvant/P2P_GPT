@@ -9,6 +9,7 @@ from generate_final_findings import generate_final_findings
 from generate_objectives import generate_research_objectives
 from generate_table_of_contents import generate_table_of_contents
 from generate_literature_review import generate_literature_review
+from generate_final_literature_review import generate_final_literature_review
 
 import time
 import openai.error
@@ -106,7 +107,12 @@ def main():
 
     generate_table_of_contents(output_folder)
 
-    generate_literature_review(output_folder)
+    # Generate literature review fragments
+    for subdir in os.listdir(output_folder):
+        generate_literature_review(output_folder, subdir)
+
+    # Generate the final 'Literature Review' section
+    generate_final_literature_review(output_folder)
 
     print("Data processing complete.")
 
