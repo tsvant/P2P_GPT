@@ -20,7 +20,7 @@ def generate_intro(output_folder):
     user_goal_file = os.path.join(user_input_folder, 'user_goal.txt')
 
     if not os.path.isfile(user_goal_file):
-        print("User goal file not found. Skipping 'Введение' (Introduction) section generation.")
+        print("User goal file not found. Skipping Introduction section generation.")
         return
 
     with open(user_goal_file, 'r', encoding='utf-8') as file:
@@ -30,7 +30,7 @@ def generate_intro(output_folder):
     objectives_file = os.path.join(new_paper_folder, 'Research objectives list.txt')
 
     if not os.path.isfile(objectives_file):
-        print("Research objectives file not found. Skipping 'Введение' (Introduction) section generation.")
+        print("Research objectives file not found. Skipping Introduction section generation.")
         return
 
     with open(objectives_file, 'r', encoding='utf-8') as file:
@@ -40,7 +40,7 @@ def generate_intro(output_folder):
     toc_file = os.path.join(new_paper_folder, 'Research table of contents.txt')
 
     if not os.path.isfile(toc_file):
-        print("Research table of contents file not found. Skipping 'Введение' (Introduction) section generation.")
+        print("Research table of contents file not found. Skipping Introduction section generation.")
         return
 
     with open(toc_file, 'r', encoding='utf-8') as file:
@@ -50,7 +50,7 @@ def generate_intro(output_folder):
     literature_review_file = os.path.join(new_paper_folder, '0. Final_Literature_Review.txt')
 
     if not os.path.isfile(literature_review_file):
-        print("Final 'Literature Review' file not found. Skipping 'Введение' (Introduction) section generation.")
+        print("Final 'Literature Review' file not found. Skipping Introduction section generation.")
         return
 
     with open(literature_review_file, 'r', encoding='utf-8') as file:
@@ -60,7 +60,7 @@ def generate_intro(output_folder):
     findings_file = os.path.join(new_paper_folder, 'Brand new findings.txt')
 
     if not os.path.isfile(findings_file):
-        print("Brand new findings file not found. Skipping 'Введение' (Introduction) section generation.")
+        print("Brand new findings file not found. Skipping Introduction section generation.")
         return
 
     with open(findings_file, 'r', encoding='utf-8') as file:
