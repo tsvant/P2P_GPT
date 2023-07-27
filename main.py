@@ -1,6 +1,5 @@
 import os
 import openai
-from openai import ChatCompletion
 from config import API_KEY
 from get_user_goal import get_user_goal
 from save_checkpoint import save_checkpoint
@@ -14,15 +13,16 @@ from generate_table_of_contents import generate_table_of_contents
 from generate_literature_review import generate_literature_review
 from generate_final_literature_review import generate_final_literature_review
 from generate_intro import generate_intro
-from section_1_1_sources import generate_section_sources
+from section_1_1_sources import generate_section_sources as generate_section_1_1_sources
 from section_1_1_generation import generate_section_1_1
 from section_1_1_edit import edit_section_1_1
-from section_i_sources import generate_section_sources
+from section_i_sources import generate_section_sources as generate_section_i_sources
 from section_i_generation import generate_section_i
 from section_i_edit import edit_section_i
 from generate_conclusion import generate_conclusion
 from generate_titles import generate_titles
 from select_best_title import select_best_title
+from generate_literature_sources_list import generate_literature_sources_list
 from generate_final_paper import generate_final_paper
 
 
@@ -131,7 +131,7 @@ def main():
         objectives_text = file.read().strip()
 
     if not os.path.exists(os.path.join(new_paper_folder, f'Section_1.1_Sources.txt')):
-        generate_section_sources(output_folder, section_number, toc_text, literature_review_text, objectives_text)
+        generate_section_1_1_sources(output_folder, section_number, toc_text, literature_review_text, objectives_text)
     if not os.path.exists(os.path.join(new_paper_folder, f'Section_1.1.txt')):
         generate_section_1_1(output_folder)
     if not os.path.exists(os.path.join(new_paper_folder, f'Section_1.1_Final.txt')):
@@ -150,7 +150,7 @@ def main():
     for section_number in section_numbers:
         prerequisite = section_to_prerequisite.get(section_number)
         if not os.path.exists(os.path.join(new_paper_folder, f'Section_{section_number}_Sources.txt')):
-            generate_section_sources(output_folder, section_number, toc_text, literature_review_text, objectives_text)
+            generate_section_i_sources(output_folder, section_number, toc_text, literature_review_text, objectives_text)
         if not os.path.exists(os.path.join(new_paper_folder, f'Section_{section_number}.txt')):
             generate_section_i(output_folder, section_number)
         if prerequisite and not os.path.exists(os.path.join(new_paper_folder, f'Section_{section_number}_Final.txt')):
@@ -167,6 +167,10 @@ def main():
     # Select the best title
     if not os.path.exists(os.path.join(output_folder, '0. Brand new research paper', 'Best title.txt')):
         select_best_title(output_folder)
+
+    # Generate the list of literature sources
+    if not os.path.exists(os.path.join(output_folder, '0. Brand new research paper', 'List_of_Literature_Sources.txt')):
+        generate_literature_sources_list(output_folder)
 
     # Generate the final research paper
     if not os.path.exists(os.path.join(output_folder, '0. Brand new research paper', 'Final Research Paper.docx')):

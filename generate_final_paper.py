@@ -26,7 +26,7 @@ def generate_final_paper(output_folder):
                     'Section_1.1_Final.txt', 'Section_1.2_Final.txt',
                     'Section_1.3_Final.txt', 'Section_2.1_Final.txt',
                     'Section_2.2_Final.txt', 'Section_2.3_Final.txt',
-                    'Brand new conclusion.txt']
+                    'Brand new conclusion.txt', 'List_of_Literature_Sources.txt']
 
     for filename in files_to_add:
         file_path = os.path.join(new_paper_folder, filename)
