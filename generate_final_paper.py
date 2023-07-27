@@ -21,7 +21,7 @@ def generate_final_paper(output_folder):
     doc = Document()
 
     # Add the sections to the document
-    files_to_add = ['Best title.txt', 'Research table of contents.txt',
+    files_to_add = ['Best title.txt', 'Brand new abstract.txt', 'Research table of contents.txt',
                     'Brand new intro.txt', '0. Final_Literature_Review.txt',
                     'Section_1.1_Final.txt', 'Section_1.2_Final.txt',
                     'Section_1.3_Final.txt', 'Section_2.1_Final.txt',

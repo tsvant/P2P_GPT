@@ -23,6 +23,7 @@ from generate_conclusion import generate_conclusion
 from generate_titles import generate_titles
 from select_best_title import select_best_title
 from generate_literature_sources_list import generate_literature_sources_list
+from generate_abstract import generate_abstract
 from generate_final_paper import generate_final_paper
 
 
@@ -171,6 +172,10 @@ def main():
     # Generate the list of literature sources
     if not os.path.exists(os.path.join(output_folder, '0. Brand new research paper', 'List_of_Literature_Sources.txt')):
         generate_literature_sources_list(output_folder)
+
+    # Generate the abstract
+    if not os.path.exists(os.path.join(output_folder, '0. Brand new research paper', 'Brand new abstract.txt')):
+        generate_abstract(output_folder)
 
     # Generate the final research paper
     if not os.path.exists(os.path.join(output_folder, '0. Brand new research paper', 'Final Research Paper.docx')):
