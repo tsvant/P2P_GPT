@@ -67,9 +67,6 @@ def main():
             create_step_by_step_chunk_analysis(output_folder, user_goal_filename, subdirectory)
 
             generate_research_findings(output_folder, subdirectory)
-            generate_final_findings(output_folder)
-            generate_research_objectives(output_folder)
-            generate_literature_review(output_folder, filename)  # Pass 'filename' as a parameter
 
             save_checkpoint(output_folder, file_index)
 
@@ -87,10 +84,6 @@ def main():
     # Generate final research findings
     if not os.path.exists(os.path.join(output_folder, '0. Brand new research paper', 'Brand new findings.txt')):
         generate_final_findings(output_folder)
-        for _ in range(100):
-            if os.path.exists(os.path.join(output_folder, '0. Brand new research paper', 'Brand new findings.txt')):
-                break
-            time.sleep(1)
 
     # Generate research objectives
     if not os.path.exists(os.path.join(output_folder, '0. Brand new research paper', 'Research objectives list.txt')):
