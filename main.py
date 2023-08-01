@@ -95,7 +95,10 @@ def main():
 
     # Generate literature review fragments
     for subdir in os.listdir(output_folder):
-        generate_literature_review(output_folder, subdir)
+        literature_review_fragment_path = os.path.join(output_folder, '0. Brand new research paper',
+                                                       'Literature Review', f'{subdir}_Literature_Review.txt')
+        if not os.path.exists(literature_review_fragment_path):
+            generate_literature_review(output_folder, subdir)
 
     # Generate the final 'Literature Review' section
     if not os.path.exists(os.path.join(output_folder, '0. Brand new research paper', '0. Final_Literature_Review.txt')):

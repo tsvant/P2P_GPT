@@ -11,6 +11,8 @@ openai.api_key = API_KEY
 def generate_final_literature_review(output_folder):
     """Generate the final 'Literature Review' section based on the research objectives and literature review fragments."""
 
+    print("Starting to generate final 'Literature Review' section...")
+
     # Define necessary file and folder paths
     new_paper_folder = os.path.join(output_folder, '0. Brand new research paper')
     literature_review_folder = os.path.join(new_paper_folder, 'Literature Review')
@@ -38,7 +40,8 @@ def generate_final_literature_review(output_folder):
         objectives_text = file.read().strip()
 
     # Load the literature review fragments
-    literature_review_files = [file for file in os.listdir(literature_review_folder) if file.endswith('_Literature_Review.txt')]
+    literature_review_files = [file for file in os.listdir(literature_review_folder) if
+                               file.endswith('_Literature_Review.txt')]
     literature_review_fragments = []
 
     for file in literature_review_files:
@@ -50,27 +53,63 @@ def generate_final_literature_review(output_folder):
     # Join all literature review fragments
     literature_review_all = '\n\n'.join(literature_review_fragments)
 
-    # Define the prompt
-    prompt = f"GPT, please generate the final 'Literature Review' section for our study and our research goal based on the provided research objectives and literature review fragments. The research objectives are as follows:\n\n{objectives_text}\n\nOur research goal is: '{user_goal}'. The literature review fragments for each source are as follows:\n\n{literature_review_all}. You are not allowed to generate new sources. Just work with the research papers and authors that were given as a source. You are not allowed to mention other sources/authors. It is strictly forbidden. However little sources/authors you are given, this is how many you should use. If there's only one source/author, use only one source/author, it is more important."
+    # Define the basic part of the prompt
+    basic_prompt = f"Our research goal is: '{user_goal}'. You are not allowed to generate new sources. Just work with the research papers and authors that were given as a source. You are not allowed to mention other sources/authors. It is strictly forbidden. However little sources/authors you are given, this is how many you should use. If there's only one source/author, use only one source/author, it is more important."
 
-    # Query GPT-3
-    response = ChatCompletion.create(
-        model="gpt-3.5-turbo-16k",
-        messages=[
-            {"role": "system",
-             "content": "You are a researcher. Your task is to generate the final 'Literature Review' section based ONLY on the provided research objectives and literature review fragments. The literature review should critically evaluate the works we mention. It should summarize the main points of view and analyze these mentioned books or articles, emphasize what influence on the formation of the researcher's own opinion and helped achieve the results. Only relevant sources dedicated to our research goal and containing interesting and relevant information should be included. Please ensure that the final 'Literature Review' section provides a logical connection between the mentioned sources and groups them according to the authors' positions, the period of creation, or other relevant features. You are not allowed to generate new sources/authors. You are punished for every extra reference. It is strictly forbidden. However little sources/authors you are given, this is how many you should use. If there's only one source/author, use only one source/author, it is more important."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.2,
-    )
+    # Split the literature review into chunks of approximately 12000 characters each
+    chunk_size = 12000  # Define the size of each chunk
+    review_chunks = [literature_review_all[i:i + chunk_size] for i in range(0, len(literature_review_all), chunk_size)]
 
-    # Extract the text from the response
-    final_literature_review = response['choices'][0]['message']['content'].strip()
+    final_literature_review = ""
+    for i, chunk in enumerate(review_chunks):
+        print(f"Processing chunk {i + 1} of {len(review_chunks)}...")
+
+        # Define the prompt for this chunk
+        prompt = f"GPT, please generate the final 'Literature Review' section for our study and our research goal based on the provided research objectives and literature review fragments. The research objectives are as follows:\n\n{objectives_text}\n\nThe literature review fragments for each source are as follows:\n\n{chunk}\n\n{basic_prompt}"
+
+        # Query GPT-3
+        response = ChatCompletion.create(
+            model="gpt-3.5-turbo-16k",
+            messages=[
+                {"role": "system",
+                 "content": "You are a researcher. Your task is to generate the final 'Literature Review' section based ONLY on the provided research objectives and literature review fragments. The literature review should critically evaluate the works we mention. It should summarize the main points of view and analyze these mentioned books or articles, emphasize what influence on the formation of the researcher's own opinion and helped achieve the results. Only relevant sources dedicated to our research goal and containing interesting and relevant information should be included. Please ensure that the final 'Literature Review' section provides a logical connection between the mentioned sources and groups them according to the authors' positions, the period of creation, or other relevant features. You are not allowed to generate new sources/authors. You are punished for every extra reference. It is strictly forbidden. However little sources/authors you are given, this is how many you should use. If there's only one source/author, use only one source/author, it is more important."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.2,
+        )
+
+        # Extract the text from the response
+        final_literature_review += response['choices'][0]['message']['content'].strip() + "\n\n"
+
+    print("Refining final 'Literature Review' section...")
+
+    # Continue to refine literature review until it is under 12000 characters
+    while len(final_literature_review) > chunk_size:
+        review_chunks = [final_literature_review[i:i + chunk_size] for i in
+                         range(0, len(final_literature_review), chunk_size)]
+        refined_review = ""
+        for i, chunk in enumerate(review_chunks):
+            print(f"Refining chunk {i + 1} of {len(review_chunks)}...")
+            prompt = f"GPT, please refine this 'Literature Review' section by selecting the most valuable insights. The literature review fragments are as follows:\n\n{chunk}\n\n{basic_prompt}"
+            response = ChatCompletion.create(
+                model="gpt-3.5-turbo-16k",
+                messages=[
+                    {"role": "system",
+                     "content": "You are a researcher. Your task is to refine this 'Literature Review' section."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.2,
+            )
+            refined_review += response['choices'][0]['message']['content'].strip() + "\n\n"
+        final_literature_review = refined_review
+
+    print("Writing final 'Literature Review' section to file...")
 
     # Write the final 'Literature Review' section into a file
     with open(final_literature_review_file, 'w', encoding='utf-8') as file:
         file.write(final_literature_review)
 
+    print("Final 'Literature Review' section generation complete.")
 
 if __name__ == "__main__":
     print("Generating final 'Literature Review' section...")
