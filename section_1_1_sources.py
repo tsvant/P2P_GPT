@@ -16,14 +16,14 @@ def generate_section_sources(output_folder, section_number, toc_text, literature
     section_sources_file = os.path.join(new_paper_folder, f'Section_{section_number}_Sources.txt')
 
     # Define the prompt
-    prompt = f"GPT, please analyze the table of contents, the final 'Literature Review' section, and the research objectives to name the naming of Section {section_number},  determine the relevant sources for Section {section_number} and to provide information on which specific research objective(s) is(are) expected to be addressed within this section. \n\nThe table of contents is as follows:\n\n{toc_text}\n\nThe final 'Literature Review' section is as follows:\n\n{literature_review_text}\n\nThe research objectives are as follows:\n\n{objectives_text}."
+    prompt = f"GPT, please analyze the table of contents, the final 'Literature Review' section, and the research objectives to name the naming of Section {section_number},  determine the relevant sources for Section {section_number} and to provide information on which specific research objective(s) is(are) expected to be addressed within this section. \n\nThe table of contents is as follows:\n\n{toc_text}\n\nThe final 'Literature Review' section is as follows:\n\n{literature_review_text}\n\nThe research objectives are as follows:\n\n{objectives_text}. analyze the table of contents, the final 'Literature Review' section, and the research objectives to name the naming of Section {section_number},  determine the relevant sources for Section {section_number} and to provide information on which specific research objective(s) is(are) expected to be addressed within this section. By analyzing the table of contents and objectives, please tell what role, narratively, in the process of gradually meeting our objectives, Section {section_number} has to play in the overall research paper, give advices to the writer."
 
     # Query GPT-3
     response = ChatCompletion.create(
         model="gpt-3.5-turbo-16k",
         messages=[
             {"role": "system",
-             "content": "You are a researcher. Your task is to analyze the table of contents, the final 'Literature Review' section, and the research objectives to determine the relevant sources for the specific section of the research paper. Please ensure that the selected sources are directly related to the content of the section and provide valuable insights and information. Additionally, provide information on which specific research objective is expected to be addressed within this section."},
+             "content": f"You are a researcher. Your task is to analyze the table of contents, the final 'Literature Review' section, and the research objectives to determine the relevant sources for the specific section of the research paper. Please ensure that the selected sources are directly related to the content of the section and provide valuable insights and information. Additionally, provide information on which specific research objective is expected to be addressed within this section. By analyzing the table of contents, describe and objectives, tell what role, narratively, in the process of gradually meeting our objectives, Section {section_number} has to play in the overall research paper, give advices to the writer."},
             {"role": "user", "content": prompt}
         ],
         temperature=0.2,

@@ -54,7 +54,7 @@ def generate_final_literature_review(output_folder):
     literature_review_all = '\n\n'.join(literature_review_fragments)
 
     # Define the basic part of the prompt
-    basic_prompt = f"Our research goal is: '{user_goal}'. You are not allowed to generate new sources. Just work with the research papers and authors that were given as a source. You are not allowed to mention other sources/authors. It is strictly forbidden. However little sources/authors you are given, this is how many you should use. If there's only one source/author, use only one source/author, it is more important."
+    basic_prompt = f"Our research goal is: '{user_goal}'. You are not allowed to generate new sources. Just work with the research papers and authors that were given as a source. You are not allowed to mention other sources/authors. It is strictly forbidden. However little sources/authors you are given, this is how many you should use. "
 
     # Split the literature review into chunks of approximately 12000 characters each
     chunk_size = 12000  # Define the size of each chunk
@@ -65,7 +65,7 @@ def generate_final_literature_review(output_folder):
         print(f"Processing chunk {i + 1} of {len(review_chunks)}...")
 
         # Define the prompt for this chunk
-        prompt = f"GPT, please generate the final 'Literature Review' section for our study and our research goal based on the provided research objectives and literature review fragments. The research objectives are as follows:\n\n{objectives_text}\n\nThe literature review fragments for each source are as follows:\n\n{chunk}\n\n{basic_prompt}"
+        prompt = f"The research objectives are as follows:\n\n{objectives_text}\n\nThe literature review fragments for each source are as follows:\n\n{chunk}\n\n{basic_prompt} \n\n Researcher, please write the final 'Literature Review' section for our study and our research goal based on the provided research objectives and literature review fragments."
 
         # Query GPT-3
         response = ChatCompletion.create(
@@ -83,25 +83,28 @@ def generate_final_literature_review(output_folder):
 
     print("Refining final 'Literature Review' section...")
 
-    # Continue to refine literature review until it is under 12000 characters
-    while len(final_literature_review) > chunk_size:
-        review_chunks = [final_literature_review[i:i + chunk_size] for i in
-                         range(0, len(final_literature_review), chunk_size)]
-        refined_review = ""
-        for i, chunk in enumerate(review_chunks):
-            print(f"Refining chunk {i + 1} of {len(review_chunks)}...")
-            prompt = f"GPT, please refine this 'Literature Review' section by selecting the most valuable insights. The literature review fragments are as follows:\n\n{chunk}\n\n{basic_prompt}"
-            response = ChatCompletion.create(
-                model="gpt-3.5-turbo-16k",
-                messages=[
-                    {"role": "system",
-                     "content": "You are a researcher. Your task is to refine this 'Literature Review' section."},
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.2,
-            )
-            refined_review += response['choices'][0]['message']['content'].strip() + "\n\n"
-        final_literature_review = refined_review
+    # Take chunks and make one out of two, up until the only left
+    while len(review_chunks) > 1:
+        refined_review_chunks = []
+        for i in range(0, len(review_chunks), 2):
+            print(f"Refining chunks {i + 1} and {i + 2} of {len(review_chunks)}...")
+            if i + 1 < len(review_chunks):  # Check if there's a next chunk
+                prompt = f"You are a researcher. Your task is to read the drafts of a 'Literature Review' section of our research paper and to write a ready-to-print version that combines the two drafts. The literature review drafts are as follows:\n\nDraft 1:\n{review_chunks[i]}\n\nDraft 2:\n{review_chunks[i + 1]}. \nResearcher, please write the final 'Literature Review' section for our study. Don't say what this sections has to contain, fill it with what it has to contain. Don't mention drafts. If idea written is taken from a source with a reference, refer to this source inside text like this: '(Gao, T., 2021).'. If it's first reference to a source, write its name, author and year in full inside the text like this: '(Gao, T., 2021, The mixed-ownership reform of Chinese state-owned enterprises and its implications for overseas economic expansion).'. Don't mention drafts. Please start writing."
+                response = ChatCompletion.create(
+                    model="gpt-3.5-turbo-16k",
+                    messages=[
+                        {"role": "system",
+                         "content": "You are a researcher. Your task is to read the drafts of a 'Literature Review' section of our research paper and to write a ready-to-print version that combines the two drafts."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    temperature=0.2,
+                )
+                refined_review_chunks.append(response['choices'][0]['message']['content'].strip())
+            else:  # If there's no next chunk, just add the current chunk to the refined review chunks
+                refined_review_chunks.append(review_chunks[i])
+        review_chunks = refined_review_chunks
+
+    final_literature_review = review_chunks[0]  # Now, only one chunk is left which is the final literature review
 
     print("Writing final 'Literature Review' section to file...")
 

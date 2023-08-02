@@ -30,7 +30,7 @@ def generate_section_sources(output_folder, section_number, toc_text, literature
         return
 
     # Define the prompt
-    prompt = f"GPT, please analyze the table of contents, the final 'Literature Review' section, and the research objectives to name the naming of Section {section_number}, determine the relevant sources for Section {section_number}, and provide information on which specific research objective(s) is(are) expected to be addressed within this section. \n\nThe table of contents is as follows:\n\n{toc_text}\n\nThe final 'Literature Review' section is as follows:\n\n{literature_review_text}\n\nThe research objectives are as follows:\n\n{objectives_text}."
+    prompt = f"The table of contents is as follows:\n\n{toc_text}\n\nThe final 'Literature Review' section is as follows:\n\n{literature_review_text}\n\nThe research objectives are as follows:\n\n{objectives_text}.\n\n Researcher, please analyze the table of contents, the final 'Literature Review' section, and the research objectives to name the naming of Section {section_number}, determine the relevant sources for Section {section_number}, and provide information on which specific research objective(s) is(are) expected to be addressed within this section. By analyzing the table of contents and objectives, please tell what role, narratively, in the process of gradually meeting our objectives, Section {section_number} has to play in the overall research paper, give advices to the writer."
 
     # Query GPT-3
     response = ChatCompletion.create(
