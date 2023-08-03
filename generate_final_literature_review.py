@@ -65,7 +65,7 @@ def generate_final_literature_review(output_folder):
         print(f"Processing chunk {i + 1} of {len(review_chunks)}...")
 
         # Define the prompt for this chunk
-        prompt = f"The research objectives are as follows:\n\n{objectives_text}\n\nThe literature review fragments for each source are as follows:\n\n{chunk}\n\n{basic_prompt} \n\n Researcher, please write the final 'Literature Review' section for our study and our research goal based on the provided research objectives and literature review fragments."
+        prompt = f"The research objectives are as follows:\n\n{objectives_text}\n\nThe literature review fragments for each source are as follows:\n\n{chunk}\n\n{basic_prompt} \n\n Researcher, please write the final 'Literature Review' section for our study and our research goal based on the provided research objectives and literature review fragments. Refer to sources inside text like this: '(Author's surname, Author's initials, YEAR).'. If it's a first reference to a source in your written text, write its name, author and year in full inside the text like this: '(Author's surname, Author's initials, YEAR, name of the paper)'."
 
         # Query GPT-3
         response = ChatCompletion.create(
@@ -89,7 +89,7 @@ def generate_final_literature_review(output_folder):
         for i in range(0, len(review_chunks), 2):
             print(f"Refining chunks {i + 1} and {i + 2} of {len(review_chunks)}...")
             if i + 1 < len(review_chunks):  # Check if there's a next chunk
-                prompt = f"You are a researcher. Your task is to read the drafts of a 'Literature Review' section of our research paper and to write a ready-to-print version that combines the two drafts. The literature review drafts are as follows:\n\nDraft 1:\n{review_chunks[i]}\n\nDraft 2:\n{review_chunks[i + 1]}. \nResearcher, please write the final 'Literature Review' section for our study. Don't say what this sections has to contain, fill it with what it has to contain. Don't mention drafts. If idea written is taken from a source with a reference, refer to this source inside text like this: '(Gao, T., 2021).'. If it's first reference to a source, write its name, author and year in full inside the text like this: '(Gao, T., 2021, The mixed-ownership reform of Chinese state-owned enterprises and its implications for overseas economic expansion).'. Don't mention drafts. Please start writing."
+                prompt = f"You are a researcher. Your task is to read the drafts of a 'Literature Review' section of our research paper and to write a ready-to-print version that combines the two drafts. The literature review drafts are as follows:\n\nDraft 1:\n{review_chunks[i]}\n\nDraft 2:\n{review_chunks[i + 1]}. \nResearcher, please write the final 'Literature Review' section for our study. Don't say what this sections has to contain, fill it with what it has to contain. Don't mention drafts. If idea written is taken from a source with a reference, refer to this source inside text like this: '(Author's surname, Author's initials, YEAR).'. If it's first reference to a source in your written text, write its name, author and year in full inside the text like this: '(Author's surname, Author's initials, YEAR, name of the paper)'. Don't mention drafts. Please start writing."
                 response = ChatCompletion.create(
                     model="gpt-3.5-turbo-16k",
                     messages=[

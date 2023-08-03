@@ -8,7 +8,7 @@ from config import API_KEY
 openai.api_key = API_KEY
 
 
-def generate_literature_review(output_folder, filename):
+def generate_literature_review(output_folder, filename, user_goal_filename):
     """Generate a literature review fragment for each source used in the research."""
 
     # Define necessary file and folder paths
@@ -40,8 +40,12 @@ def generate_literature_review(output_folder, filename):
     with open(findings_file, 'r', encoding='utf-8') as file:
         findings_text = file.read().strip()
 
+    # Load the user's research goal
+    with open(user_goal_filename, 'r', encoding='utf-8') as file:
+        user_goal = file.read().strip()
+
     # Define the prompt
-    prompt = f"GPT, please generate a concise literature review fragment for this source based on the provided abstract for it and the research findings that were derived from it. The metadata and abstract of the source is as follows:\n\n{abstract_text}\n\nThe research findings from the source are as follows:\n\n{findings_text}."
+    prompt = f"Researcher, please write a concise literature review fragment for this source based on the provided abstract for it and the research findings that were derived from it. The metadata and abstract of the source is as follows:\n\n{abstract_text}\n\nThe research findings from the source are as follows:\n\n{findings_text}. \n\n The user's research goal is: '{user_goal}'. \n\n  refer to this source inside text like this: '(Author's surname, Author's initials, YEAR).'. If it's first reference to a source in your written text, write its name, author and year in full inside the text like this: '(Author's surname, Author's initials, YEAR, name of the paper)'. This literature review fragment should critically evaluate this work on the topic of our research goal. It should summarize the main points of view and analyze this article/book that had the greatest influence on the formation of the researcher's own opinion and helped achieve the results. Only relevant information should be included."
 
     # Query GPT-3
     response = ChatCompletion.create(

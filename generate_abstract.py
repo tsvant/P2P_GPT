@@ -27,11 +27,13 @@ def generate_abstract(output_folder):
             loaded_texts[filename] = file.read().strip()
 
     # Define the prompt
-    prompt = f"""Researcher, please write an Abstract section for our research paper based on the provided information. The Abstract should be self-contained, fully understandable on its own, and reflect the structure of the larger work. It should start by defining the purpose of the research, state the objective, describe the research methods used, summarize the main research results, and discuss the main conclusions. The abstract should also provide keywords related to the research, use only the most relevant terms. The abstract should avoid passive sentences, long sentences, obscure jargon, repetition and filler words, and detailed descriptions.
+    prompt = f"""Researcher, please write an Abstract section for our research paper based on the provided information. 
 
     The Introduction section is as follows:\n\n{loaded_texts['Brand new intro.txt']}
 
     The Conclusion section is as follows:\n\n{loaded_texts['Brand new conclusion.txt']}
+    
+    The Abstract should be self-contained, fully understandable on its own, and reflect the structure of the larger work. It should start by defining the purpose of the research, state the objective, describe the research methods used, summarize the main research results, and discuss the main conclusions. The abstract should also provide keywords related to the research, use only the most relevant terms. The abstract should avoid passive sentences, long sentences, obscure jargon, repetition and filler words, and detailed descriptions. Please ensure that the Abstract section is concise, coherent, and engaging. Avoid using boring introductory phrases as 'in conclusion'.
     """
 
     # Query GPT-3
