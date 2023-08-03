@@ -22,6 +22,10 @@ def generate_literature_review(output_folder, filename, user_goal_filename):
     abstract_file = os.path.join(output_folder, filename, 'full_abstract.txt')
     findings_file = os.path.join(output_folder, filename, 'Research findings', f'{filename}_research_findings.txt')
 
+    # Define the path to the user goal file
+    user_input_folder = os.path.join(os.getcwd(), 'User input')
+    user_goal_filename = os.path.join(user_input_folder, 'user_goal.txt')
+
     # Exclude the "0. Brand new research paper" folder
     if filename == "0. Brand new research paper":
         return
@@ -72,10 +76,14 @@ if __name__ == "__main__":
 
     output_folder = os.path.join(os.getcwd(), 'P2P Output')
 
+    # Define the path to the user goal file
+    user_input_folder = os.path.join(os.getcwd(), 'User input')
+    user_goal_filename = os.path.join(user_input_folder, 'user_goal.txt')
+
     # Loop over all folders in the output folder
     subdirectories = [subdir for subdir in os.listdir(output_folder) if os.path.isdir(os.path.join(output_folder, subdir))]
 
     for subdir in subdirectories:
-        generate_literature_review(output_folder, subdir)
+        generate_literature_review(output_folder, subdir, user_goal_filename)
 
     print("Literature review fragments generation complete.")
