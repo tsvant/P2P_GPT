@@ -1,4 +1,5 @@
 import os
+import time
 import openai
 from config import API_KEY
 from get_user_goal import get_user_goal
@@ -25,14 +26,40 @@ from select_best_title import select_best_title
 from generate_literature_sources_list import generate_literature_sources_list
 from generate_abstract import generate_abstract
 from generate_final_paper import generate_final_paper
-
-
-
-
-import time
-import openai.error
+from futures3 import ThreadPoolExecutor
+from retry import retry
+import threading
 
 openai.api_key = API_KEY
+
+# Create a global lock
+checkpoint_lock = threading.Lock()
+
+
+def save_checkpoint(output_folder, file_index):
+    """Save the current file index to a checkpoint file."""
+    checkpoint_file = os.path.join(output_folder, 'checkpoint.txt')
+
+    # Only one thread can hold the lock at a time
+    with checkpoint_lock:
+        with open(checkpoint_file, 'w', encoding='utf-8') as file:
+            file.write(str(file_index))
+
+
+@retry(openai.error.ServiceUnavailableError, tries=5, delay=30)
+def process_file_wrapper(file_index, filename, input_folder, output_folder, user_goal_filename, total_files):
+    print(f"Processing file {file_index}/{total_files}: {filename}")
+
+    process_file(os.path.join(input_folder, filename), output_folder)
+
+    subdirectory = os.path.splitext(filename)[0]
+    create_step_by_step_chunk_analysis(output_folder, user_goal_filename, subdirectory)
+
+    generate_research_findings(output_folder, subdirectory)
+
+    save_checkpoint(output_folder, file_index)
+
+    print(f"Completed processing file {file_index}/{total_files}: {filename}\n")
 
 def main():
     print("Starting data processing...")
@@ -57,29 +84,10 @@ def main():
     print(f"Total files for processing: {total_files}\n")
 
     # Start from the last processed file index
-    for file_index, filename in enumerate(input_files[last_processed_file_index:], start=last_processed_file_index + 1):
-        print(f"Processing file {file_index}/{total_files}: {filename}")
-
-        try:
-            process_file(os.path.join(input_folder, filename), output_folder)
-
-            subdirectory = os.path.splitext(filename)[0]
-            create_step_by_step_chunk_analysis(output_folder, user_goal_filename, subdirectory)
-
-            generate_research_findings(output_folder, subdirectory)
-
-            save_checkpoint(output_folder, file_index)
-
-        except openai.error.ServiceUnavailableError:
-            print("Service Unavailable Error. Retrying after 30 seconds...")
-            time.sleep(30)  # Wait for 30 seconds before retrying the API call
-            file_index -= 1  # Decrement file_index to retry the same file
-            continue
-
-        # Save the checkpoint after each successful iteration
-        save_checkpoint(output_folder, file_index)
-
-        print(f"Completed processing file {file_index}/{total_files}: {filename}\n")
+    with ThreadPoolExecutor() as executor:
+        executor.map(lambda pair: process_file_wrapper(pair[0] + last_processed_file_index + 1, pair[1], input_folder,
+                                                       output_folder, user_goal_filename, total_files),
+                     enumerate(input_files[last_processed_file_index:]))
 
     # Generate final research findings
     if not os.path.exists(os.path.join(output_folder, '0. Brand new research paper', 'Brand new findings.txt')):

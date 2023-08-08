@@ -4,11 +4,13 @@ import os
 import openai
 from openai import ChatCompletion
 from config import API_KEY
+from futures3 import ThreadPoolExecutor
 
 openai.api_key = API_KEY
 
 
-def generate_literature_review(output_folder, filename, user_goal_filename):
+def generate_literature_review(args):
+    output_folder, filename, user_goal_filename = args
     """Generate a literature review fragment for each source used in the research."""
 
     # Define necessary file and folder paths
@@ -70,8 +72,7 @@ def generate_literature_review(output_folder, filename, user_goal_filename):
     with open(literature_review_file, 'w', encoding='utf-8') as file:
         file.write(literature_review_fragment)
 
-
-if __name__ == "__main__":
+def literature_shenanigans():
     print("Generating literature review fragments...")
 
     output_folder = os.path.join(os.getcwd(), 'P2P Output')
@@ -83,7 +84,11 @@ if __name__ == "__main__":
     # Loop over all folders in the output folder
     subdirectories = [subdir for subdir in os.listdir(output_folder) if os.path.isdir(os.path.join(output_folder, subdir))]
 
-    for subdir in subdirectories:
-        generate_literature_review(output_folder, subdir, user_goal_filename)
+    with ThreadPoolExecutor() as executor:
+        executor.map(generate_literature_review, [(output_folder, subdir, user_goal_filename) for subdir in subdirectories])
 
     print("Literature review fragments generation complete.")
+
+
+if __name__ == "__main__":
+    literature_shenanigans()

@@ -2,6 +2,7 @@ import os
 import openai
 from openai import ChatCompletion
 from config import API_KEY
+from futures3 import ThreadPoolExecutor
 
 openai.api_key = API_KEY
 
@@ -51,7 +52,7 @@ def generate_research_findings(output_folder, subdirectory_name):
         file.write(findings)
 
 
-if __name__ == "__main__":
+def findings_shenanigans():
     print("Generating research findings...")
 
     input_folder = 'Upload here'
@@ -60,7 +61,10 @@ if __name__ == "__main__":
     # Loop over all folders in the output folder
     subdirectories = [subdir for subdir in os.listdir(output_folder) if os.path.isdir(os.path.join(output_folder, subdir))]
 
-    for subdir in subdirectories:
-        generate_research_findings(output_folder, subdir)
+    with ThreadPoolExecutor() as executor:
+        executor.map(lambda subdir: generate_research_findings(output_folder, subdir), subdirectories)
 
     print("Research findings generation complete.")
+
+if __name__ == "__main__":
+    findings_shenanigans()

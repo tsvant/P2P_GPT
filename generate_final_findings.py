@@ -4,9 +4,25 @@ import os
 import openai
 from openai import ChatCompletion
 from config import API_KEY
+from futures3 import ThreadPoolExecutor
 
 openai.api_key = API_KEY
 
+def load_research_findings(file_path):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        return file.read()
+
+def process_findings_chunk(chunk, basic_prompt):
+    prompt = f"GPT, please act as a researcher and generate comprehensive research findings based on the provided research findings. The findings from the research papers are summarized as follows:\n\n{chunk}\n\n{basic_prompt}"
+    response = ChatCompletion.create(
+        model="gpt-3.5-turbo-16k",
+        messages=[
+            {"role": "system", "content": "You are a researcher. Your task is to generate finalized research findings based on the provided research findings."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.2,
+    )
+    return response['choices'][0]['message']['content'].strip() + "\n\n"
 
 def generate_final_findings(output_folder):
     """Generate finalized research findings based on the research_findings files for each research paper."""
@@ -21,16 +37,13 @@ def generate_final_findings(output_folder):
     os.makedirs(new_paper_folder, exist_ok=True)
 
     # Retrieve the existing research findings for each paper
-    research_findings = []
-    for subdir in os.listdir(output_folder):
-        if subdir != '0. Brand new research paper' and os.path.isdir(os.path.join(output_folder, subdir)):
-            research_findings_file = os.path.join(output_folder, subdir, 'Research findings',
-                                                  f'{subdir}_research_findings.txt')
+    research_findings_files = [
+        os.path.join(output_folder, subdir, 'Research findings', f'{subdir}_research_findings.txt') for subdir in
+        os.listdir(output_folder) if
+        subdir != '0. Brand new research paper' and os.path.isdir(os.path.join(output_folder, subdir))]
 
-            # Load the research findings file content
-            print(f"Loading research findings from {subdir}...")
-            with open(research_findings_file, 'r', encoding='utf-8') as file:
-                research_findings.append(file.read())
+    with ThreadPoolExecutor() as executor:
+        research_findings = list(executor.map(load_research_findings, research_findings_files))
 
     # Load the user's research goal text
     parent_directory = os.path.dirname(output_folder)
@@ -51,25 +64,10 @@ def generate_final_findings(output_folder):
     findings_chunks = [findings_text[i:i + chunk_size] for i in range(0, len(findings_text), chunk_size)]
 
     final_findings = ""
-    for i, chunk in enumerate(findings_chunks):
-        print(f"Processing chunk {i + 1} of {len(findings_chunks)}...")
-
-        # Define the prompt for this chunk
-        prompt = f"GPT, please act as a researcher and generate comprehensive research findings based on the provided research findings. The findings from the research papers are summarized as follows:\n\n{chunk}\n\n{basic_prompt}"
-
-        # Query GPT-3
-        response = ChatCompletion.create(
-            model="gpt-3.5-turbo-16k",
-            messages=[
-                {"role": "system",
-                 "content": "You are a researcher. Your task is to generate finalized research findings based on the provided research findings."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.2,
-        )
-
-        # Extract the text from the response
-        final_findings += response['choices'][0]['message']['content'].strip() + "\n\n"
+    with ThreadPoolExecutor() as executor:
+        final_findings_parts = list(
+            executor.map(lambda chunk: process_findings_chunk(chunk, basic_prompt), findings_chunks))
+    final_findings = ''.join(final_findings_parts)
 
     print("Refining final research findings...")
 
