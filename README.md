@@ -2,7 +2,7 @@ Say goodbye to sleepless nights reading endless scientific papers for your resea
 
 ---
 
-**Get Started Locally 🎓: Unleash the Academic Wizard in You!**
+## Get Started Locally 🧙‍♂️
 
 Can't wait to dive into the academic ocean with P2P_GPT? Don your wizard's hat and follow these magical spells to run the program locally:
 
